@@ -33,6 +33,7 @@ public class Member {
     private Role role;
 
     public static Member createMember(MemberFormDto memberFormDto, PasswordEncoder passwordEncoder) {
+        //git update test
         Member member = new Member();
         member.setName(memberFormDto.getName());
         member.setEmail(memberFormDto.getEmail());
