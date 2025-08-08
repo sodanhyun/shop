@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -17,11 +18,20 @@ public class SecurityConfig {
     /* 스프링 시큐리티 필터 체인 */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        /*
-        http.설정1
-        http.설정2
-        http.설정3
-        */
+        http.formLogin((it) -> it
+                .loginPage("/members/login")
+                .defaultSuccessUrl("/")
+                .usernameParameter("email")
+                .failureUrl("/members/login/error")
+        );
+
+//        http.csrf(AbstractHttpConfigurer::disable);
+
+        http.logout(logout -> logout
+                .logoutUrl("/members/logout")
+                .logoutSuccessUrl("/")
+        );
+
         return http.build();
     }
 

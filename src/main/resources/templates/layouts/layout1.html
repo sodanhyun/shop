@@ -16,13 +16,13 @@
 </head>
 <body>
     <!-- 헤더 영역 -->
-    <div th:replace="fragments/header::header"></div>
+    <div th:replace="~{fragments/header::header}"></div>
     <!-- 컨텐츠 영역 -->
     <div layout:fragment="content" class="content">
         <!--여기로 들어옴-->
     </div>
     <!-- 푸터 영역 -->
-    <div th:replace="fragments/footer::footer"></div>
+    <div th:replace="~{fragments/footer::footer}"></div>
     <th:block layout:fragment="script"></th:block>
 </body>
 </html>
