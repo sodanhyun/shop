@@ -79,6 +79,7 @@ class CartTest {
         */
         // 객체(JPA) 관점
         Member foundMember = savedCart.getMember();
+        foundMember.getEmail();
 
         System.out.println("저장하고난 후 cart의 주소값: " + savedCart.hashCode());
         System.out.println("저장하고난 후 member의 주소값: " + foundMember.hashCode());

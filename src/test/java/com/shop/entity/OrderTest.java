@@ -1,8 +1,10 @@
 package com.shop.entity;
 
 import com.shop.constant.ItemSellStatus;
-import com.shop.repository.ItemRepository;
-import com.shop.repository.OrderRepository;
+import com.shop.repository.item.ItemRepository;
+import com.shop.repository.MemberRepository;
+import com.shop.repository.OrderItemRepository;
+import com.shop.repository.order.OrderRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
@@ -31,6 +33,12 @@ class OrderTest {
     @PersistenceContext
     EntityManager em;
 
+    @Autowired
+    MemberRepository memberRepository;
+
+    @Autowired
+    OrderItemRepository orderItemRepository;
+
     public Item createItem() {
         Item item = new Item();
         item.setItemNm("테스트 상품");
@@ -41,6 +49,30 @@ class OrderTest {
         item.setRegTime(LocalDateTime.now());
         item.setUpdateTime(LocalDateTime.now());
         return item;
+    }
+
+    public Order createOrder() {
+        Order order = new Order();
+        for(int i=0; i<3; i++) {
+            //2. 아이템 엔티티 저장
+            Item item = createItem();
+            itemRepository.save(item);
+            //3. 위에서 저장된 아이템으로 주문-아이템(주문과 특정 아이템을 연결해주는 역할) 저장
+            OrderItem orderItem = new OrderItem();
+            orderItem.setItem(item);
+            orderItem.setOrder(order);
+            orderItem.setCount(10);
+            orderItem.setOrderPrice(1_000);
+            //orderItemRepository.save(orderItem);
+            /* 현재 Order는 저장이 안됨, order 엔티티의 orderItems 리스트에 orderItem 엔티티를 추가 */
+            order.getOrderItems().add(orderItem);
+        }
+        Member member = new Member();
+        memberRepository.save(member);
+
+        order.setMember(member);
+        orderRepository.save(order);
+        return order;
     }
 
     @Test
@@ -72,6 +104,34 @@ class OrderTest {
         Order savedOrder = orderRepository.findById(order.getId())
                 .orElseThrow(EntityNotFoundException::new);
         assertEquals(3, savedOrder.getOrderItems().size());
+    }
+
+    @Test
+    @DisplayName("고아 객체 제거 테스트")
+    public void orphanRemovalTest() {
+        Order order = createOrder();
+        order.getOrderItems().remove(0);
+        em.flush();
+    }
+
+    @Test
+    @DisplayName("지연 로딩 테스트")
+    public void lazyLoadingTest() {
+        Order order = createOrder();
+        OrderItem orderItem = order.getOrderItems().get(0);
+        Long orderItemId = orderItem.getId();
+
+        em.flush();
+        em.clear();
+
+        OrderItem savedOrderItem = orderItemRepository.findById(orderItemId)
+                .orElseThrow(EntityNotFoundException::new);
+        System.out.println("Order class : " + savedOrderItem.getOrder().getClass());
+        System.out.println("================================");
+        savedOrderItem.getOrder().getOrderDate();
+        System.out.println("================================");
+        savedOrderItem.getItem().getItemDetail();
+        em.clear();
     }
 
 }

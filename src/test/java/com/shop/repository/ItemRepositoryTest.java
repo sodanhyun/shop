@@ -6,6 +6,7 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.shop.constant.ItemSellStatus;
 import com.shop.entity.Item;
+import com.shop.repository.item.ItemRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.DisplayName;
@@ -166,7 +167,7 @@ public class ItemRepositoryTest {
         JPAQuery<Item> conditionedQuery = baseQuery.where(booleanBuilder);
         /*
         SELECT * FROM item
-        WHERE itemDetail LIKE ?
+        WHERE itemDetail LIKE ?3wz
         AND price > ?
         AND item_sell_status = "SELL" <<-- 조건부
         */

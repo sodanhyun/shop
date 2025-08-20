@@ -10,18 +10,18 @@ import java.time.LocalDateTime;
 @Table(name = "order_item")
 @Getter
 @Setter
-public class OrderItem {
+public class OrderItem extends BaseEntity {
 
     @Id
     @Column(name = "order_item_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     private Item item;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private Order order;
 
@@ -29,7 +29,21 @@ public class OrderItem {
 
     private Integer count;
 
-    private LocalDateTime regTime;
+    public static OrderItem createOrderItem(Item item, int count) {
+        OrderItem orderItem = new OrderItem();
+        orderItem.setItem(item);
+        orderItem.setCount(count);
+        orderItem.setOrderPrice(item.getPrice());
+        item.removeStock(count);
+        return orderItem;
+    }
 
-    private LocalDateTime updateTime;
+    public int getTotalPrice() {
+        return orderPrice * count;
+    }
+
+    public void cancel() {
+        this.item.addStock(count);
+    }
+
 }
